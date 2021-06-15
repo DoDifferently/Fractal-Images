@@ -1,14 +1,21 @@
-#ifndef BITMAPFILEHEADER
-#define BITMAPFILEHEADER
+#ifndef BITMAPFILEHEADER_H_
+#define BITMAPFILEHEADER_H_
 
 #include <cstdint>
 
-struct BitMapFileHeader
+namespace Fun
 {
-    char header[2]{'B', 'M'};
-    int32_t file_size;
-    int32_t reserved{0};
-    int32_t dataOffset;
-};
+    #pragma pack(push, 2)
 
-#endif /* BITMAPFILEHEADER */
+    struct BitmapFileHeader
+    {
+        char header[2]{'B', 'M'};
+        int32_t file_size;
+        int32_t reserved{0};
+        int32_t dataOffset;
+    };
+
+    #pragma(pop)
+}
+
+#endif /* BITMAPFILEHEADER_H_ */

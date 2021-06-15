@@ -7,7 +7,7 @@ using namespace Fun;
 
 namespace Fun
 {
-    Bitmap::Bitmap(int width, int height) : m_iWidth(width), m_iHeight(height), m_pPixels(new uint8_t[width*height*3]{0})
+    Bitmap::Bitmap(int width, int height) : m_iWidth(width), m_iHeight(height), m_pPixels(new uint8_t[width*height*3]{})
     {
     }
 
@@ -21,7 +21,7 @@ namespace Fun
         st_infoHeader.height = m_iHeight;
 
         std::ofstream binFile;
-        binFile.open(filename, std::ios::out|std::ios::binary);
+        binFile.open(filename, std::ios::out | std::ios::binary);
         if (!binFile.is_open())
         {
             std::cout << "Could not create " << filename << std::endl;
@@ -34,13 +34,20 @@ namespace Fun
         if (!binFile)
         {
             std::cout << "Could not write data to file " << filename << std::endl;
+            return false;
         }
         binFile.close();
         return true;
     }
 
     void Bitmap::SetPixel(int x, int y, uint8_t red, uint8_t green, uint8_t blue)
-    {        
+    {
+        uint8_t *pPixel = m_pPixels.get();
+        pPixel += (y*3)*m_iWidth + (x*3); // y*m_iWidth -> no of pixels
+        // because bitmap is little endian format
+        pPixel[0] = blue;
+        pPixel[1] = green;
+        pPixel[2] = red;
     }
 
     Bitmap::~Bitmap()

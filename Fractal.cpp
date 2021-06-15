@@ -1,5 +1,7 @@
 #include <iostream>
+#include <cstdint>
 #include "Bitmap.h"
+#include "Mandelbrot.h"
 using namespace std;
 using namespace Fun;
 
@@ -19,11 +21,14 @@ int main(void)
         {
             double xFractal = (x - IMG_WIDTH/2)*(2.0/IMG_WIDTH);
             double yFractal = (y - IMG_HEIGHT/2)*(2.0/IMG_HEIGHT);
-            if(xFractal < min)
+            int iterations = Mandelbrot::s_GetIterations(xFractal, yFractal);
+            uint8_t red = (uint8_t)(256*(double)iterations/Mandelbrot::MAX_ITERATIONS);
+            bitmap.SetPixel(x, y, red, 0, 0);
+            if(red < min)
             {
                 min = xFractal;
             }
-            if(xFractal > max)
+            if(red > max)
             {
                 max = xFractal;
             }

@@ -15,8 +15,8 @@ namespace Fun
     {
         BitmapFileHeader st_fileHeader;
         BitmapInfoHeader st_infoHeader;
-        st_fileHeader.file_size = sizeof(BitmapFileHeader)*sizeof(BitmapInfoHeader) + m_iWidth*m_iHeight*3;
-        st_fileHeader.dataOffset = sizeof(BitmapFileHeader)*sizeof(BitmapInfoHeader);
+        st_fileHeader.file_size = sizeof(BitmapFileHeader) + sizeof(BitmapInfoHeader) + m_iWidth*m_iHeight*3;
+        st_fileHeader.dataOffset = sizeof(BitmapFileHeader) + sizeof(BitmapInfoHeader);
         st_infoHeader.width = m_iWidth;
         st_infoHeader.height = m_iHeight;
 

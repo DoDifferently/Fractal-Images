@@ -1,4 +1,3 @@
-#include <iostream>
 #include "ZoomList.h"
 
 namespace Fun
@@ -10,7 +9,6 @@ namespace Fun
         m_dxCenter += (zoom.iX - m_iWidth/2)*m_dScale;
         m_dyCenter += (zoom.iY - m_iHeight/2)*m_dScale;
         m_dScale *= zoom.dScale;
-        std::cout << m_dxCenter << ", " << m_dyCenter << ", " << m_dScale << std::endl;
     }
 
     std::pair<double, double> ZoomList::DoZoom(int x, int y)

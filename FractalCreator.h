@@ -21,12 +21,13 @@ namespace Fun
         public:
             FractalCreator(int width, int height);
             virtual ~FractalCreator();
-
-            void CalculateIteration();
-            void CalculateTotalIterations();
-            void DrawFractal();
+            void Run(std::string name);
             void AddZoom(const Zoom& zoom);
-            void WriteBitmap(std::string name);
+        private:
+            void m_CalculateIteration();
+            void m_CalculateTotalIterations();
+            void m_DrawFractal();
+            void m_WriteBitmap(std::string name);
     };
 } // namespace FUn
 

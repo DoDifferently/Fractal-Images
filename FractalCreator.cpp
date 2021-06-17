@@ -1,16 +1,25 @@
 #include <cmath>
 #include "FractalCreator.h"
 #include "Mandelbrot.h"
+#include "RGB.h"
 
 namespace Fun
 {
+    void FractalCreator::Run(std::string name)
+    {
+        m_CalculateIteration();
+        m_CalculateTotalIterations();
+        m_DrawFractal();
+        m_WriteBitmap(name); 
+    }
+
     FractalCreator::FractalCreator(int width, int height) : m_iWidth(width), m_iHeight(height),
     m_upHistogram(new int[Mandelbrot::MAX_ITERATIONS]{0}), m_upFractal(new int[m_iWidth*m_iHeight]{0}),
     m_bitmap(m_iWidth, m_iHeight), m_zoomList(m_iWidth, m_iHeight)
     {
     }
     
-    void FractalCreator::CalculateIteration()
+    void FractalCreator::m_CalculateIteration()
     {        
         for(int y = 0; y < m_iHeight; ++y)
         {
@@ -26,15 +35,20 @@ namespace Fun
             }
         }
     }
-    void FractalCreator::CalculateTotalIterations()
+    
+    void FractalCreator::m_CalculateTotalIterations()
     {
         for(int i = 0; i < Mandelbrot::MAX_ITERATIONS; ++i)
         {
             m_iTotal += m_upHistogram[i];
         }
     }
-    void FractalCreator::DrawFractal()
+
+    void FractalCreator::m_DrawFractal()
     {
+        RGB start_color(0, 0, 0);
+        RGB end_color(0, 255, 0);
+        RGB color_diff = start_color - end_color;
         for(int y = 0; y < m_iHeight; ++y)
         {
             for(int x = 0; x < m_iWidth; ++x)
@@ -50,17 +64,21 @@ namespace Fun
                     {
                         hue += ((double)m_upHistogram[i])/m_iTotal;
                     }
-                    green = pow(255, hue);
+                    red = pow(start_color.r - color_diff.r, hue);
+                    green = pow(start_color.g - color_diff.g, hue);
+                    blue = pow(start_color.b - color_diff.b, hue);
                 }            
                 m_bitmap.SetPixel(x, y, red, green, blue);
             }
         }
     }
+
     void FractalCreator::AddZoom(const Zoom& zoom)
     {
         m_zoomList.Add(zoom);
     }
-    void FractalCreator::WriteBitmap(std::string name)
+
+    void FractalCreator::m_WriteBitmap(std::string name)
     {
         m_bitmap.Write(name);
     }

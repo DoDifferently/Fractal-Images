@@ -1,8 +1,10 @@
 #include <iostream>
 #include <cstdint>
 #include <memory>
+#include <cmath>
 #include "Bitmap.h"
 #include "Mandelbrot.h"
+#include "ZoomList.h"
 using namespace std;
 using namespace Fun;
 
@@ -16,6 +18,11 @@ int main(void)
     double min = INT_MAX;
     double max = INT_MIN;
     
+    ZoomList zoomList(IMG_WIDTH, IMG_HEIGHT);
+    zoomList.Add(Zoom(IMG_WIDTH/2, IMG_HEIGHT/2, 4.0/IMG_WIDTH));
+    zoomList.Add(Zoom(295, IMG_HEIGHT - 202, 0.1));
+    zoomList.Add(Zoom(312, IMG_HEIGHT - 304, 0.1));
+
     unique_ptr<int[]> histogram(new int[Mandelbrot::MAX_ITERATIONS]{0});
     unique_ptr<int[]> fractal(new int[IMG_WIDTH*IMG_WIDTH]{0});
     
@@ -23,9 +30,8 @@ int main(void)
     {
         for(int x = 0; x < IMG_WIDTH; ++x)
         {
-            double xFractal = (x - IMG_WIDTH/2 - 200)*(2.0/IMG_WIDTH);
-            double yFractal = (y - IMG_HEIGHT/2)*(2.0/IMG_HEIGHT);
-            int iterations = Mandelbrot::s_GetIterations(xFractal, yFractal);
+            pair<double, double> coords = zoomList.DoZoom(x, y);
+            int iterations = Mandelbrot::s_GetIterations(coords.first, coords.second);
             fractal[y*IMG_WIDTH + x] = iterations;
             if(iterations < Mandelbrot::MAX_ITERATIONS)
             {
@@ -53,15 +59,19 @@ int main(void)
     {
         for(int x = 0; x < IMG_WIDTH; ++x)
         {
-            int iterations = fractal[y*IMG_WIDTH + x];
-            double hue = 0.0;
-            for(int i = 0; i <= iterations; ++i)
-            {
-                hue += ((double)histogram[i])/total;
-            }
             uint8_t red = 0;
-            uint8_t green = hue*255;
+            uint8_t green = 0;
             uint8_t blue = 0;
+            int iterations = fractal[y*IMG_WIDTH + x];
+            if(iterations != Mandelbrot::MAX_ITERATIONS)
+            {
+                double hue = 0.0;
+                for(int i = 0; i <= iterations; ++i)
+                {
+                    hue += ((double)histogram[i])/total;
+                }
+                green = pow(255, hue);
+            }            
             bitmap.SetPixel(x, y, red, green, blue);
         }
     }

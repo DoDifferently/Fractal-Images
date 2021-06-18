@@ -12,9 +12,10 @@ int main(void)
 
     FractalCreator fractalCreator(IMG_WIDTH, IMG_HEIGHT);
     fractalCreator.AddRange(0.0, RGB(0, 0, 0));
-    fractalCreator.AddRange(0.3, RGB(255, 0, 0));
-    fractalCreator.AddRange(0.5, RGB(255, 255, 0));
+    fractalCreator.AddRange(0.05, RGB(255, 99, 71));
+    fractalCreator.AddRange(0.08, RGB(255, 215, 0));
     fractalCreator.AddRange(1.0, RGB(255, 255, 255));
+
     fractalCreator.AddZoom(Zoom(IMG_WIDTH/2, IMG_HEIGHT/2, 4.0/IMG_WIDTH));
     fractalCreator.AddZoom(Zoom(295, IMG_HEIGHT - 202, 0.1));
     fractalCreator.AddZoom(Zoom(312, IMG_HEIGHT - 304, 0.1));

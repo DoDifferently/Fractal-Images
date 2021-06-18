@@ -1,5 +1,5 @@
 #include <cmath>
-#include <iostream>
+#include <assert.h>
 #include "FractalCreator.h"
 #include "Mandelbrot.h"
 
@@ -43,13 +43,22 @@ namespace Fun
             }
             m_vRangeTotals[rangeIndex] += pixels;
         }
-        int total = 0;
-        for(auto val: m_vRangeTotals)
+    }
+
+    int FractalCreator::m_getRange(int iterations) const
+    {
+        int range = 0;
+        for(int i = 1; i < m_vRanges.size(); ++i)
         {
-            std::cout << "Range total: " << val << std::endl;
-            total += val;
+            if(m_vRanges[i] > iterations)
+            {
+                break;
+            }
+            range = i;
         }
-        std::cout << "Overall total: " << total << std::endl;
+        assert(range > -1);
+        assert(range < m_vRanges.size());
+        return range;
     }
 
     void FractalCreator::m_CalculateIteration()
@@ -75,32 +84,37 @@ namespace Fun
         {
             m_iTotal += m_upHistogram[i];
         }
-        std::cout << "Overall total: " << m_iTotal << std::endl;
     }
 
     void FractalCreator::m_DrawFractal()
     {
-        RGB start_color(0, 0, 0);
-        RGB end_color(0, 0, 255);
-        RGB color_diff = start_color - end_color;
         for(int y = 0; y < m_iHeight; ++y)
         {
             for(int x = 0; x < m_iWidth; ++x)
             {
+                int iterations = m_upFractal[y*m_iWidth + x];
+
+                int range = m_getRange(iterations);
+                int rangeTotal = m_vRangeTotals[range];
+                int rangeStart = m_vRanges[range];
+
+                RGB& start_color = m_vColors[range];
+                RGB& end_color = m_vColors[range+1];
+                RGB color_diff = end_color - start_color;
+
                 uint8_t red = 0;
                 uint8_t green = 0;
                 uint8_t blue = 0;
-                int iterations = m_upFractal[y*m_iWidth + x];
                 if(iterations != Mandelbrot::MAX_ITERATIONS)
                 {
-                    double hue = 0.0;
-                    for(int i = 0; i <= iterations; ++i)
+                    int total_pixels = 0;
+                    for(int i = rangeStart; i <= iterations; ++i)
                     {
-                        hue += ((double)m_upHistogram[i])/m_iTotal;
+                        total_pixels += m_upHistogram[i];
                     }
-                    red = start_color.r - color_diff.r*hue;
-                    green = start_color.g - color_diff.g*hue;
-                    blue = start_color.b - color_diff.b*hue;
+                    red = start_color.r + color_diff.r*((double)total_pixels/rangeTotal);
+                    green = start_color.g + color_diff.g*((double)total_pixels/rangeTotal);
+                    blue = start_color.b + color_diff.b*((double)total_pixels/rangeTotal);
                 }            
                 m_bitmap.SetPixel(x, y, red, green, blue);
             }

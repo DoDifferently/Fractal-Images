@@ -38,6 +38,7 @@ namespace Fun
             void m_CalculateTotalIterations();
             void m_DrawFractal();
             void m_WriteBitmap(std::string name);
+            int m_getRange(int iterations) const;
     };
 } // namespace FUn
 

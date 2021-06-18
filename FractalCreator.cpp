@@ -1,7 +1,7 @@
 #include <cmath>
+#include <iostream>
 #include "FractalCreator.h"
 #include "Mandelbrot.h"
-#include "RGB.h"
 
 namespace Fun
 {
@@ -9,6 +9,7 @@ namespace Fun
     {
         m_CalculateIteration();
         m_CalculateTotalIterations();
+        m_CalculateRangeTotals();
         m_DrawFractal();
         m_WriteBitmap(name); 
     }
@@ -19,6 +20,38 @@ namespace Fun
     {
     }
     
+    void FractalCreator::AddRange(double rangeEnd, const RGB& rgb)
+    {
+        m_vRanges.push_back(rangeEnd*Mandelbrot::MAX_ITERATIONS);
+        m_vColors.push_back(rgb);
+        if(m_bGotFirstRange)
+        {
+            m_vRangeTotals.push_back(0);
+        }
+        m_bGotFirstRange = true;
+    }
+
+    void FractalCreator::m_CalculateRangeTotals()
+    {
+        int rangeIndex = 0;
+        for(int i = 0; i < Mandelbrot::MAX_ITERATIONS; ++i)
+        {
+            int pixels = m_upHistogram[i];
+            if(i >= m_vRanges[rangeIndex+1])
+            {
+                rangeIndex++;
+            }
+            m_vRangeTotals[rangeIndex] += pixels;
+        }
+        int total = 0;
+        for(auto val: m_vRangeTotals)
+        {
+            std::cout << "Range total: " << val << std::endl;
+            total += val;
+        }
+        std::cout << "Overall total: " << total << std::endl;
+    }
+
     void FractalCreator::m_CalculateIteration()
     {        
         for(int y = 0; y < m_iHeight; ++y)
@@ -42,12 +75,13 @@ namespace Fun
         {
             m_iTotal += m_upHistogram[i];
         }
+        std::cout << "Overall total: " << m_iTotal << std::endl;
     }
 
     void FractalCreator::m_DrawFractal()
     {
         RGB start_color(0, 0, 0);
-        RGB end_color(0, 255, 0);
+        RGB end_color(0, 0, 255);
         RGB color_diff = start_color - end_color;
         for(int y = 0; y < m_iHeight; ++y)
         {
@@ -64,9 +98,9 @@ namespace Fun
                     {
                         hue += ((double)m_upHistogram[i])/m_iTotal;
                     }
-                    red = pow(start_color.r - color_diff.r, hue);
-                    green = pow(start_color.g - color_diff.g, hue);
-                    blue = pow(start_color.b - color_diff.b, hue);
+                    red = start_color.r - color_diff.r*hue;
+                    green = start_color.g - color_diff.g*hue;
+                    blue = start_color.b - color_diff.b*hue;
                 }            
                 m_bitmap.SetPixel(x, y, red, green, blue);
             }
